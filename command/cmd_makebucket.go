@@ -15,8 +15,13 @@ var MakeBucketCommand = &cli.Command{
 	Name:     "mb",
 	HelpName: "make-bucket",
 	Usage:    "TODO",
+	Flags:    globalFlags,
 	Before: func(c *cli.Context) error {
 		validate := func() error {
+			if err := validateGlobalFlags(c); err != nil {
+				return err
+			}
+
 			if c.Args().Len() != 1 {
 				return fmt.Errorf("expected only 1 argument")
 			}
@@ -30,6 +35,7 @@ var MakeBucketCommand = &cli.Command{
 				return fmt.Errorf("invalid s3 bucket")
 			}
 
+			setGlobalFlags(c)
 			return nil
 		}
 		if err := validate(); err != nil {

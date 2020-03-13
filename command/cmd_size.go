@@ -13,26 +13,21 @@ import (
 	"github.com/peak/s5cmd/strutil"
 )
 
-type sizeAndCount struct {
-	size  int64
-	count int64
-}
-
-func (s *sizeAndCount) addObject(obj *storage.Object) {
-	s.size += obj.Size
-	s.count++
+var sizeCommandFlags = []cli.Flag{
+	&cli.BoolFlag{Name: "humanize", Aliases: []string{"H"}},
+	&cli.BoolFlag{Name: "group", Aliases: []string{"g"}},
 }
 
 var SizeCommand = &cli.Command{
 	Name:     "du",
 	HelpName: "disk-usage",
 	Usage:    "TODO",
-	Flags: []cli.Flag{
-		&cli.BoolFlag{Name: "humanize", Aliases: []string{"H"}},
-		&cli.BoolFlag{Name: "group", Aliases: []string{"g"}},
-	},
+	Flags:    append(sizeCommandFlags, globalFlags...),
 	Before: func(c *cli.Context) error {
 		validate := func() error {
+			if err := validateGlobalFlags(c); err != nil {
+				return err
+			}
 			if c.Args().Len() != 1 {
 				return fmt.Errorf("expected only 1 argument")
 			}
@@ -42,6 +37,8 @@ var SizeCommand = &cli.Command{
 			printError(givenCommand(c), c.Command.Name, err)
 			return err
 		}
+
+		setGlobalFlags(c)
 		return nil
 	},
 	Action: func(c *cli.Context) error {
@@ -124,6 +121,16 @@ func Size(
 	}
 
 	return nil
+}
+
+type sizeAndCount struct {
+	size  int64
+	count int64
+}
+
+func (s *sizeAndCount) addObject(obj *storage.Object) {
+	s.size += obj.Size
+	s.count++
 }
 
 // SizeMessage is the structure for logging disk usage.

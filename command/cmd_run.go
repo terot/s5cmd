@@ -19,8 +19,13 @@ var RunCommand = &cli.Command{
 	Name:     "run",
 	HelpName: "run",
 	Usage:    "TODO",
+	Flags:    globalFlags,
 	Before: func(c *cli.Context) error {
 		validate := func() error {
+			if err := validateGlobalFlags(c); err != nil {
+				return err
+			}
+
 			if c.Args().Len() > 1 {
 				return fmt.Errorf("expected only 1 file")
 			}
@@ -30,6 +35,8 @@ var RunCommand = &cli.Command{
 			printError(givenCommand(c), c.Command.Name, err)
 			return err
 		}
+
+		setGlobalFlags(c)
 		return nil
 	},
 	Action: func(c *cli.Context) error {

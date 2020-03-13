@@ -14,16 +14,22 @@ import (
 	"github.com/peak/s5cmd/strutil"
 )
 
+var listCommandFlags = []cli.Flag{
+	&cli.BoolFlag{Name: "etag", Aliases: []string{"e"}},
+	&cli.BoolFlag{Name: "humanize", Aliases: []string{"H"}},
+}
+
 var ListCommand = &cli.Command{
 	Name:     "ls",
 	HelpName: "list",
 	Usage:    "TODO",
-	Flags: []cli.Flag{
-		&cli.BoolFlag{Name: "etag", Aliases: []string{"e"}},
-		&cli.BoolFlag{Name: "humanize", Aliases: []string{"H"}},
-	},
+	Flags:    append(listCommandFlags, globalFlags...),
 	Before: func(c *cli.Context) error {
 		validate := func() error {
+			if err := validateGlobalFlags(c); err != nil {
+				return err
+			}
+
 			if c.Args().Len() > 1 {
 				return fmt.Errorf("expected only 1 argument")
 			}
@@ -33,6 +39,8 @@ var ListCommand = &cli.Command{
 			printError(givenCommand(c), c.Command.Name, err)
 			return err
 		}
+
+		setGlobalFlags(c)
 		return nil
 	},
 	Action: func(c *cli.Context) error {

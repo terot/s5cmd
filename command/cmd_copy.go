@@ -39,9 +39,13 @@ var CopyCommand = &cli.Command{
 	Name:     "cp",
 	HelpName: "copy",
 	Usage:    "TODO",
-	Flags:    copyCommandFlags,
+	Flags:    append(copyCommandFlags, globalFlags...),
 	Before: func(c *cli.Context) error {
 		validate := func() error {
+			if err := validateGlobalFlags(c); err != nil {
+				return err
+			}
+
 			if c.Args().Len() != 2 {
 				return fmt.Errorf("expected source and destination arguments")
 			}
@@ -61,6 +65,8 @@ var CopyCommand = &cli.Command{
 			printError(givenCommand(c), c.Command.Name, err)
 			return err
 		}
+
+		setGlobalFlags(c)
 		return nil
 	},
 	Action: func(c *cli.Context) error {

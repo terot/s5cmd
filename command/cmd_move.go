@@ -11,9 +11,13 @@ var MoveCommand = &cli.Command{
 	Name:     "mv",
 	HelpName: "move",
 	Usage:    "TODO",
-	Flags:    copyCommandFlags, // move and copy commands share the same flags
+	Flags:    append(copyCommandFlags, globalFlags...), // move and copy commands share the same flags
 	Before: func(c *cli.Context) error {
 		validate := func() error {
+			if err := validateGlobalFlags(c); err != nil {
+				return err
+			}
+
 			if c.Args().Len() != 2 {
 				return fmt.Errorf("expected source and destination arguments")
 			}
@@ -23,6 +27,8 @@ var MoveCommand = &cli.Command{
 			printError(givenCommand(c), c.Command.Name, err)
 			return err
 		}
+
+		setGlobalFlags(c)
 		return nil
 	},
 	Action: func(c *cli.Context) error {

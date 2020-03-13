@@ -17,8 +17,12 @@ var DeleteCommand = &cli.Command{
 	Name:     "rm",
 	HelpName: "delete",
 	Usage:    "TODO",
+	Flags:    globalFlags,
 	Before: func(c *cli.Context) error {
 		validate := func() error {
+			if err := validateGlobalFlags(c); err != nil {
+				return err
+			}
 			// TODO(ig): support variadic args
 			if c.Args().Len() != 1 {
 				return fmt.Errorf("expected 1 object to remove")
@@ -29,6 +33,8 @@ var DeleteCommand = &cli.Command{
 			printError(givenCommand(c), c.Command.Name, err)
 			return err
 		}
+
+		setGlobalFlags(c)
 		return nil
 	},
 	Action: func(c *cli.Context) error {

@@ -22,6 +22,15 @@ func Init(level string, json bool) {
 	globalLogger = newLogger(level, json)
 }
 
+func SetLevel(level string) {
+	logLevel := levelFromString(level)
+	globalLogger.level = logLevel
+}
+
+func SetJSON(json bool) {
+	globalLogger.json = json
+}
+
 // logLevel is the level of Logger.
 type logLevel int
 

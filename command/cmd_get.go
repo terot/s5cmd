@@ -12,9 +12,13 @@ var GetCommand = &cli.Command{
 	Name:     "get",
 	HelpName: "get",
 	Usage:    "TODO",
-	Flags:    copyCommandFlags,
+	Flags:    append(copyCommandFlags, globalFlags...),
 	Before: func(c *cli.Context) error {
 		validate := func() error {
+			if err := validateGlobalFlags(c); err != nil {
+				return err
+			}
+
 			arglen := c.Args().Len()
 			if arglen == 0 {
 				return fmt.Errorf("source is required")
@@ -28,6 +32,8 @@ var GetCommand = &cli.Command{
 		if err := validate(); err != nil {
 			printError(givenCommand(c), c.Command.Name, err)
 		}
+
+		setGlobalFlags(c)
 		return nil
 	},
 	Action: func(c *cli.Context) error {

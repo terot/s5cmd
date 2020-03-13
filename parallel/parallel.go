@@ -1,6 +1,7 @@
 package parallel
 
 import (
+	"runtime"
 	"sync"
 )
 
@@ -8,8 +9,18 @@ var global *Manager
 
 type Task func() error
 
-func Init(workercount int) {
-	global = New(workercount)
+const minNumWorkers = 2
+
+func Init(workerCount int) {
+	if workerCount < 0 {
+		workerCount = runtime.NumCPU() * -workerCount
+	}
+
+	if workerCount < minNumWorkers {
+		workerCount = minNumWorkers
+	}
+
+	global = New(workerCount)
 }
 
 func Close() { global.Close() }
