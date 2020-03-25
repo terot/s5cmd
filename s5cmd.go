@@ -93,7 +93,7 @@ func main() {
 	}
 
 	if *gops || os.Getenv("S5CMD_GOPS") != "" {
-		if err := agent.Listen(&agent.Options{NoShutdownCleanup: true}); err != nil {
+		if err := agent.Listen(&agent.Options{ShutdownCleanup: false}); err != nil {
 			log.Fatal("-ERR", err)
 		}
 	}
