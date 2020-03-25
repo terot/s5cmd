@@ -14,8 +14,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/google/gops/agent"
-
 	"github.com/peak/s5cmd/complete"
 	"github.com/peak/s5cmd/core"
 	"github.com/peak/s5cmd/stats"
@@ -69,7 +67,6 @@ func main() {
 	flag.IntVar(&retries, "r", 10, "Retry S3 operations N times before failing")
 	printStats := flag.Bool("stats", false, "Always print stats")
 	showVersion := flag.Bool("version", false, "Prints current version")
-	gops := flag.Bool("gops", false, "Initialize gops agent")
 	verbose := flag.Bool("vv", false, "Verbose output")
 	flag.BoolVar(&noVerifySSL, "no-verify-ssl", false, "Don't verify SSL certificates")
 
@@ -92,11 +89,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *gops || os.Getenv("S5CMD_GOPS") != "" {
-		if err := agent.Listen(&agent.Options{ShutdownCleanup: false}); err != nil {
-			log.Fatal("-ERR", err)
-		}
-	}
 
 	if *showVersion {
 		fmt.Printf("s5cmd version %s", GitSummary)
